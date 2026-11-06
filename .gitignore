@@ -1,0 +1,14 @@
+# Secrets
+.env
+api.text
+
+# Python
+.venv/
+.venv-1/
+__pycache__/
+
+# macOS
+.DS_Store
+
+# Local reference, not part of the app
+contoh.py
