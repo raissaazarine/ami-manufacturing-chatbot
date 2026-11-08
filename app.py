@@ -21,8 +21,12 @@ from trial import PDF_PATH, load_source_documents
 
 load_dotenv(find_dotenv())
 
-CHAT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
+# OpenRouter keys start with "sk-or-" and need OpenRouter's URL and "openai/" model names.
+USES_OPENROUTER = os.getenv("OPENAI_API_KEY", "").startswith("sk-or-")
+MODEL_PREFIX = "openai/" if USES_OPENROUTER else ""
+CHAT_MODEL = os.getenv("OPENAI_MODEL", MODEL_PREFIX + "gpt-4o-mini")
+EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", MODEL_PREFIX + "text-embedding-3-small")
 TOP_K = 4  # documents retrieved by similarity
 MAX_CONTEXT_DOCS = 8  # models named in a question are added on top of TOP_K
 CHUNK_SIZE = 1500  # characters; model spec documents already fit and stay whole
@@ -327,7 +331,8 @@ def main():
     if not api_key:
         st.error("OPENAI_API_KEY belum diisi. Buat file .env di folder project: OPENAI_API_KEY=sk-...")
         return
-    client = OpenAI(api_key=api_key)
+    base_url = os.getenv("OPENAI_BASE_URL") or (OPENROUTER_URL if USES_OPENROUTER else None)
+    client = OpenAI(api_key=api_key, base_url=base_url)
 
     documents = load_booklet()
     st.sidebar.header("Dokumen")
